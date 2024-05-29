@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import useFetchCourses from './hooks/useFetchCourses';
+import FilterSidebar from './components/FilterSidebar';
+import CourseList from './components/CourseList';
+import './styles/App.scss';
 
-function App() {
+const App: React.FC = () => {
+  const { courses, loading, error } = useFetchCourses();
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  const uniqueTags = Array.from(new Set(courses.flatMap(course => course.tags)));
+
+  const filteredCourses = selectedTag ? courses.filter(course => course.tags.includes(selectedTag)) : courses;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <FilterSidebar tags={uniqueTags} selectedTag={selectedTag} onSelectTag={setSelectedTag} />
+      <CourseList courses={filteredCourses} />
     </div>
   );
-}
+};
 
 export default App;
